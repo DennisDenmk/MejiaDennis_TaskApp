@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.taskapp.MainActivity
 import com.example.taskapp.R
 import com.example.taskapp.data.Task
@@ -28,6 +29,7 @@ class TasksFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val viewModel = (activity as MainActivity).tasksViewModel
+        val authViewModel = (activity as MainActivity).authViewModel
 
         adapter = TaskAdapter(
             onToggle = { viewModel.toggleTask(it) },
@@ -50,6 +52,16 @@ class TasksFragment : Fragment() {
 
         binding.fabAddTask.setOnClickListener {
             showAddTaskDialog(viewModel)
+        }
+
+        binding.btnLogout.setOnClickListener {
+            authViewModel.logout()
+        }
+
+        authViewModel.authSuccess.observe(viewLifecycleOwner) { success ->
+            if (!success) {
+                findNavController().navigate(R.id.action_tasksFragment_to_loginFragment)
+            }
         }
 
         viewModel.fetchTasks()
